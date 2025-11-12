@@ -726,15 +726,69 @@ function FluentUI:CreateWindow(config)
         function Tab:CreateColorPicker(config)
             config = config or {}
             local pickerName = config.Name or "Color Picker"
-            local default = config.Default or Color3.fromRGB(255, 255, 255)
+            local default = config.Default or Color3.fromRGB(255, 0, 0)
             local callback = config.Callback or function() end
+            
+            local currentColor = default
+            local hue, sat, val = 0, 1, 1
+            
+            -- Converter RGB para HSV
+            local function RGBtoHSV(color)
+                local r, g, b = color.R, color.G, color.B
+                local max = math.max(r, g, b)
+                local min = math.min(r, g, b)
+                local delta = max - min
+                
+                local h = 0
+                if delta > 0 then
+                    if max == r then
+                        h = ((g - b) / delta) % 6
+                    elseif max == g then
+                        h = (b - r) / delta + 2
+                    else
+                        h = (r - g) / delta + 4
+                    end
+                    h = h / 6
+                end
+                
+                local s = max == 0 and 0 or delta / max
+                local v = max
+                
+                return h, s, v
+            end
+            
+            -- Converter HSV para RGB
+            local function HSVtoRGB(h, s, v)
+                local r, g, b
+                
+                local i = math.floor(h * 6)
+                local f = h * 6 - i
+                local p = v * (1 - s)
+                local q = v * (1 - f * s)
+                local t = v * (1 - (1 - f) * s)
+                
+                i = i % 6
+                
+                if i == 0 then r, g, b = v, t, p
+                elseif i == 1 then r, g, b = q, v, p
+                elseif i == 2 then r, g, b = p, v, t
+                elseif i == 3 then r, g, b = p, q, v
+                elseif i == 4 then r, g, b = t, p, v
+                elseif i == 5 then r, g, b = v, p, q
+                end
+                
+                return Color3.new(r, g, b)
+            end
+            
+            hue, sat, val = RGBtoHSV(default)
             
             local PickerFrame = Create("Frame", {
                 Name = "ColorPicker",
                 Parent = TabContent,
                 BackgroundColor3 = Theme.Secondary,
                 BorderSizePixel = 0,
-                Size = UDim2.new(1, -20, 0, 40)
+                Size = UDim2.new(1, -20, 0, 40),
+                ClipsDescendants = false
             })
             
             Create("UICorner", {
@@ -758,7 +812,7 @@ function FluentUI:CreateWindow(config)
             local ColorDisplay = Create("TextButton", {
                 Name = "Display",
                 Parent = PickerFrame,
-                BackgroundColor3 = default,
+                BackgroundColor3 = currentColor,
                 BorderSizePixel = 0,
                 Position = UDim2.new(1, -45, 0.5, -12),
                 Size = UDim2.new(0, 30, 0, 24),
@@ -770,14 +824,255 @@ function FluentUI:CreateWindow(config)
                 CornerRadius = UDim.new(0, 6)
             })
             
+            -- Painel do Color Picker
+            local PickerPanel = Create("Frame", {
+                Name = "PickerPanel",
+                Parent = PickerFrame,
+                BackgroundColor3 = Theme.Background,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 0, 0, 45),
+                Size = UDim2.new(0, 0, 0, 0),
+                Visible = false,
+                ClipsDescendants = true,
+                ZIndex = 10
+            })
+            
+            Create("UICorner", {
+                Parent = PickerPanel,
+                CornerRadius = UDim.new(0, 8)
+            })
+            
+            -- Gradiente de saturação/brilho
+            local ColorCanvas = Create("ImageButton", {
+                Name = "ColorCanvas",
+                Parent = PickerPanel,
+                BackgroundColor3 = HSVtoRGB(hue, 1, 1),
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 10, 0, 10),
+                Size = UDim2.new(0, 180, 0, 180),
+                AutoButtonColor = false,
+                Image = ""
+            })
+            
+            Create("UICorner", {
+                Parent = ColorCanvas,
+                CornerRadius = UDim.new(0, 6)
+            })
+            
+            -- Gradiente branco para a saturação
+            local WhiteGradient = Create("Frame", {
+                Name = "White",
+                Parent = ColorCanvas,
+                BackgroundColor3 = Color3.new(1, 1, 1),
+                BorderSizePixel = 0,
+                Size = UDim2.new(1, 0, 1, 0)
+            })
+            
+            Create("UICorner", {
+                Parent = WhiteGradient,
+                CornerRadius = UDim.new(0, 6)
+            })
+            
+            local WhiteGrad = Create("UIGradient", {
+                Parent = WhiteGradient,
+                Transparency = NumberSequence.new({
+                    NumberSequenceKeypoint.new(0, 0),
+                    NumberSequenceKeypoint.new(1, 1)
+                }),
+                Rotation = 0
+            })
+            
+            -- Gradiente preto para o brilho
+            local BlackGradient = Create("Frame", {
+                Name = "Black",
+                Parent = ColorCanvas,
+                BackgroundColor3 = Color3.new(0, 0, 0),
+                BorderSizePixel = 0,
+                Size = UDim2.new(1, 0, 1, 0)
+            })
+            
+            Create("UICorner", {
+                Parent = BlackGradient,
+                CornerRadius = UDim.new(0, 6)
+            })
+            
+            local BlackGrad = Create("UIGradient", {
+                Parent = BlackGradient,
+                Transparency = NumberSequence.new({
+                    NumberSequenceKeypoint.new(0, 1),
+                    NumberSequenceKeypoint.new(1, 0)
+                }),
+                Rotation = 90
+            })
+            
+            -- Cursor do canvas
+            local CanvasCursor = Create("Frame", {
+                Name = "Cursor",
+                Parent = ColorCanvas,
+                BackgroundColor3 = Color3.new(1, 1, 1),
+                BorderSizePixel = 2,
+                BorderColor3 = Color3.new(0, 0, 0),
+                Position = UDim2.new(sat, -5, 1 - val, -5),
+                Size = UDim2.new(0, 10, 0, 10),
+                ZIndex = 11
+            })
+            
+            Create("UICorner", {
+                Parent = CanvasCursor,
+                CornerRadius = UDim.new(1, 0)
+            })
+            
+            -- Barra de HUE (arco-íris)
+            local HueBar = Create("ImageButton", {
+                Name = "HueBar",
+                Parent = PickerPanel,
+                BackgroundColor3 = Color3.new(1, 1, 1),
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 200, 0, 10),
+                Size = UDim2.new(0, 20, 0, 180),
+                AutoButtonColor = false,
+                Image = ""
+            })
+            
+            Create("UICorner", {
+                Parent = HueBar,
+                CornerRadius = UDim.new(0, 6)
+            })
+            
+            local HueGradient = Create("UIGradient", {
+                Parent = HueBar,
+                Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+                    ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+                    ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+                    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+                    ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+                    ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+                    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+                }),
+                Rotation = 90
+            })
+            
+            -- Cursor da barra de HUE
+            local HueCursor = Create("Frame", {
+                Name = "Cursor",
+                Parent = HueBar,
+                BackgroundColor3 = Color3.new(1, 1, 1),
+                BorderSizePixel = 2,
+                BorderColor3 = Color3.new(0, 0, 0),
+                Position = UDim2.new(0.5, -10, hue, -3),
+                Size = UDim2.new(1, 4, 0, 6),
+                ZIndex = 11
+            })
+            
+            Create("UICorner", {
+                Parent = HueCursor,
+                CornerRadius = UDim.new(0, 3)
+            })
+            
+            -- Display RGB
+            local RGBDisplay = Create("TextLabel", {
+                Name = "RGB",
+                Parent = PickerPanel,
+                BackgroundColor3 = Theme.Secondary,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 10, 0, 200),
+                Size = UDim2.new(1, -20, 0, 25),
+                Font = Enum.Font.GothamBold,
+                Text = string.format("RGB: %d, %d, %d", 
+                    math.floor(currentColor.R * 255),
+                    math.floor(currentColor.G * 255),
+                    math.floor(currentColor.B * 255)
+                ),
+                TextColor3 = Theme.Text,
+                TextSize = 11
+            })
+            
+            Create("UICorner", {
+                Parent = RGBDisplay,
+                CornerRadius = UDim.new(0, 6)
+            })
+            
+            -- Função para atualizar cor
+            local function UpdateColor()
+                currentColor = HSVtoRGB(hue, sat, val)
+                ColorDisplay.BackgroundColor3 = currentColor
+                ColorCanvas.BackgroundColor3 = HSVtoRGB(hue, 1, 1)
+                RGBDisplay.Text = string.format("RGB: %d, %d, %d", 
+                    math.floor(currentColor.R * 255),
+                    math.floor(currentColor.G * 255),
+                    math.floor(currentColor.B * 255)
+                )
+                callback(currentColor)
+            end
+            
+            -- Arrasto no canvas
+            local canvasDragging = false
+            
+            ColorCanvas.MouseButton1Down:Connect(function()
+                canvasDragging = true
+            end)
+            
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    canvasDragging = false
+                end
+            end)
+            
+            ColorCanvas.InputChanged:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseMovement then
+                    if canvasDragging then
+                        local posX = math.clamp((input.Position.X - ColorCanvas.AbsolutePosition.X) / ColorCanvas.AbsoluteSize.X, 0, 1)
+                        local posY = math.clamp((input.Position.Y - ColorCanvas.AbsolutePosition.Y) / ColorCanvas.AbsoluteSize.Y, 0, 1)
+                        
+                        sat = posX
+                        val = 1 - posY
+                        
+                        CanvasCursor.Position = UDim2.new(sat, -5, 1 - val, -5)
+                        UpdateColor()
+                    end
+                end
+            end)
+            
+            -- Arrasto na barra de HUE
+            local hueDragging = false
+            
+            HueBar.MouseButton1Down:Connect(function()
+                hueDragging = true
+            end)
+            
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    hueDragging = false
+                end
+            end)
+            
+            HueBar.InputChanged:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseMovement then
+                    if hueDragging then
+                        local posY = math.clamp((input.Position.Y - HueBar.AbsolutePosition.Y) / HueBar.AbsoluteSize.Y, 0, 1)
+                        
+                        hue = posY
+                        HueCursor.Position = UDim2.new(0.5, -10, hue, -3)
+                        UpdateColor()
+                    end
+                end
+            end)
+            
+            -- Toggle do painel
+            local expanded = false
+            
             ColorDisplay.MouseButton1Click:Connect(function()
-                -- Aqui você pode implementar um picker mais complexo
-                callback(default)
-                Window:Notify({
-                    Title = "Color Picker",
-                    Content = "RGB: " .. math.floor(default.R * 255) .. ", " .. math.floor(default.G * 255) .. ", " .. math.floor(default.B * 255),
-                    Type = "Info"
-                })
+                expanded = not expanded
+                
+                if expanded then
+                    PickerPanel.Visible = true
+                    Tween(PickerPanel, {Size = UDim2.new(1, 0, 0, 235)}, AnimConfig.Medium)
+                else
+                    Tween(PickerPanel, {Size = UDim2.new(1, 0, 0, 0)}, AnimConfig.Fast)
+                    task.wait(0.2)
+                    PickerPanel.Visible = false
+                end
             end)
             
             return PickerFrame
