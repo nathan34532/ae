@@ -824,22 +824,37 @@ function FluentUI:CreateWindow(config)
                 CornerRadius = UDim.new(0, 6)
             })
             
-            -- Painel do Color Picker
+            -- Painel do Color Picker (AGORA NA SCREENGUI PRINCIPAL)
             local PickerPanel = Create("Frame", {
                 Name = "PickerPanel",
-                Parent = PickerFrame,
+                Parent = ScreenGui,
                 BackgroundColor3 = Theme.Background,
                 BorderSizePixel = 0,
-                Position = UDim2.new(0, 0, 0, 45),
+                Position = UDim2.new(0.5, 380, 0.5, -150),
                 Size = UDim2.new(0, 0, 0, 0),
                 Visible = false,
-                ClipsDescendants = true,
-                ZIndex = 10
+                ClipsDescendants = false,
+                ZIndex = 100
             })
             
             Create("UICorner", {
                 Parent = PickerPanel,
-                CornerRadius = UDim.new(0, 8)
+                CornerRadius = UDim.new(0, 12)
+            })
+            
+            -- Sombra do painel
+            local PanelShadow = Create("ImageLabel", {
+                Name = "Shadow",
+                Parent = PickerPanel,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, -15, 0, -15),
+                Size = UDim2.new(1, 30, 1, 30),
+                ZIndex = 99,
+                Image = "rbxassetid://5554236805",
+                ImageColor3 = Color3.fromRGB(0, 0, 0),
+                ImageTransparency = 0.5,
+                ScaleType = Enum.ScaleType.Slice,
+                SliceCenter = Rect.new(23, 23, 277, 277)
             })
             
             -- Gradiente de saturação/brilho
@@ -848,15 +863,16 @@ function FluentUI:CreateWindow(config)
                 Parent = PickerPanel,
                 BackgroundColor3 = HSVtoRGB(hue, 1, 1),
                 BorderSizePixel = 0,
-                Position = UDim2.new(0, 10, 0, 10),
-                Size = UDim2.new(0, 180, 0, 180),
+                Position = UDim2.new(0, 15, 0, 15),
+                Size = UDim2.new(0, 220, 0, 220),
                 AutoButtonColor = false,
-                Image = ""
+                Image = "",
+                ZIndex = 101
             })
             
             Create("UICorner", {
                 Parent = ColorCanvas,
-                CornerRadius = UDim.new(0, 6)
+                CornerRadius = UDim.new(0, 8)
             })
             
             -- Gradiente branco para a saturação
@@ -865,12 +881,13 @@ function FluentUI:CreateWindow(config)
                 Parent = ColorCanvas,
                 BackgroundColor3 = Color3.new(1, 1, 1),
                 BorderSizePixel = 0,
-                Size = UDim2.new(1, 0, 1, 0)
+                Size = UDim2.new(1, 0, 1, 0),
+                ZIndex = 102
             })
             
             Create("UICorner", {
                 Parent = WhiteGradient,
-                CornerRadius = UDim.new(0, 6)
+                CornerRadius = UDim.new(0, 8)
             })
             
             local WhiteGrad = Create("UIGradient", {
@@ -888,12 +905,13 @@ function FluentUI:CreateWindow(config)
                 Parent = ColorCanvas,
                 BackgroundColor3 = Color3.new(0, 0, 0),
                 BorderSizePixel = 0,
-                Size = UDim2.new(1, 0, 1, 0)
+                Size = UDim2.new(1, 0, 1, 0),
+                ZIndex = 103
             })
             
             Create("UICorner", {
                 Parent = BlackGradient,
-                CornerRadius = UDim.new(0, 6)
+                CornerRadius = UDim.new(0, 8)
             })
             
             local BlackGrad = Create("UIGradient", {
@@ -910,11 +928,11 @@ function FluentUI:CreateWindow(config)
                 Name = "Cursor",
                 Parent = ColorCanvas,
                 BackgroundColor3 = Color3.new(1, 1, 1),
-                BorderSizePixel = 2,
+                BorderSizePixel = 3,
                 BorderColor3 = Color3.new(0, 0, 0),
-                Position = UDim2.new(sat, -5, 1 - val, -5),
-                Size = UDim2.new(0, 10, 0, 10),
-                ZIndex = 11
+                Position = UDim2.new(sat, -8, 1 - val, -8),
+                Size = UDim2.new(0, 16, 0, 16),
+                ZIndex = 105
             })
             
             Create("UICorner", {
@@ -928,15 +946,16 @@ function FluentUI:CreateWindow(config)
                 Parent = PickerPanel,
                 BackgroundColor3 = Color3.new(1, 1, 1),
                 BorderSizePixel = 0,
-                Position = UDim2.new(0, 200, 0, 10),
-                Size = UDim2.new(0, 20, 0, 180),
+                Position = UDim2.new(0, 250, 0, 15),
+                Size = UDim2.new(0, 25, 0, 220),
                 AutoButtonColor = false,
-                Image = ""
+                Image = "",
+                ZIndex = 101
             })
             
             Create("UICorner", {
                 Parent = HueBar,
-                CornerRadius = UDim.new(0, 6)
+                CornerRadius = UDim.new(0, 8)
             })
             
             local HueGradient = Create("UIGradient", {
@@ -958,16 +977,16 @@ function FluentUI:CreateWindow(config)
                 Name = "Cursor",
                 Parent = HueBar,
                 BackgroundColor3 = Color3.new(1, 1, 1),
-                BorderSizePixel = 2,
+                BorderSizePixel = 3,
                 BorderColor3 = Color3.new(0, 0, 0),
-                Position = UDim2.new(0.5, -10, hue, -3),
-                Size = UDim2.new(1, 4, 0, 6),
-                ZIndex = 11
+                Position = UDim2.new(0.5, -15, hue, -4),
+                Size = UDim2.new(1, 6, 0, 8),
+                ZIndex = 105
             })
             
             Create("UICorner", {
                 Parent = HueCursor,
-                CornerRadius = UDim.new(0, 3)
+                CornerRadius = UDim.new(0, 4)
             })
             
             -- Display RGB
@@ -976,8 +995,8 @@ function FluentUI:CreateWindow(config)
                 Parent = PickerPanel,
                 BackgroundColor3 = Theme.Secondary,
                 BorderSizePixel = 0,
-                Position = UDim2.new(0, 10, 0, 200),
-                Size = UDim2.new(1, -20, 0, 25),
+                Position = UDim2.new(0, 15, 0, 245),
+                Size = UDim2.new(1, -30, 0, 30),
                 Font = Enum.Font.GothamBold,
                 Text = string.format("RGB: %d, %d, %d", 
                     math.floor(currentColor.R * 255),
@@ -985,12 +1004,13 @@ function FluentUI:CreateWindow(config)
                     math.floor(currentColor.B * 255)
                 ),
                 TextColor3 = Theme.Text,
-                TextSize = 11
+                TextSize = 12,
+                ZIndex = 101
             })
             
             Create("UICorner", {
                 Parent = RGBDisplay,
-                CornerRadius = UDim.new(0, 6)
+                CornerRadius = UDim.new(0, 8)
             })
             
             -- Função para atualizar cor
@@ -1028,7 +1048,7 @@ function FluentUI:CreateWindow(config)
                         sat = posX
                         val = 1 - posY
                         
-                        CanvasCursor.Position = UDim2.new(sat, -5, 1 - val, -5)
+                        CanvasCursor.Position = UDim2.new(sat, -8, 1 - val, -8)
                         UpdateColor()
                     end
                 end
@@ -1053,7 +1073,7 @@ function FluentUI:CreateWindow(config)
                         local posY = math.clamp((input.Position.Y - HueBar.AbsolutePosition.Y) / HueBar.AbsoluteSize.Y, 0, 1)
                         
                         hue = posY
-                        HueCursor.Position = UDim2.new(0.5, -10, hue, -3)
+                        HueCursor.Position = UDim2.new(0.5, -15, hue, -4)
                         UpdateColor()
                     end
                 end
@@ -1066,10 +1086,12 @@ function FluentUI:CreateWindow(config)
                 expanded = not expanded
                 
                 if expanded then
+                    -- Posicionar ao lado direito da UI principal
+                    PickerPanel.Position = UDim2.new(0.5, 380, 0.5, -150)
                     PickerPanel.Visible = true
-                    Tween(PickerPanel, {Size = UDim2.new(1, 0, 0, 235)}, AnimConfig.Medium)
+                    Tween(PickerPanel, {Size = UDim2.new(0, 290, 0, 285)}, AnimConfig.Bounce)
                 else
-                    Tween(PickerPanel, {Size = UDim2.new(1, 0, 0, 0)}, AnimConfig.Fast)
+                    Tween(PickerPanel, {Size = UDim2.new(0, 0, 0, 0)}, AnimConfig.Fast)
                     task.wait(0.2)
                     PickerPanel.Visible = false
                 end
@@ -1314,129 +1336,422 @@ end
 return FluentUI
 
 --[[
-    EXEMPLO DE USO:
-    
-    local FluentUI = loadstring(game:HttpGet("URL_DO_SCRIPT"))()
-    
-    local Window = FluentUI:CreateWindow({
-        Title = "Fluent UI Library",
-        Subtitle = "v1.0 - Modern & Smooth"
-    })
-    
-    -- Notificação de boas-vindas
-    Window:Notify({
-        Title = "Bem-vindo!",
-        Content = "UI carregada com sucesso!",
-        Duration = 3,
-        Type = "Success"
-    })
-    
-    -- Criar primeira aba
-    local MainTab = Window:CreateTab({
-        Name = "Principal",
-        Icon = "🏠"
-    })
-    
-    MainTab:CreateSection("Controles Principais")
-    
-    MainTab:CreateButton({
-        Name = "Clique Aqui!",
-        Callback = function()
+    ============================================
+    EXEMPLO DE USO COM FUNÇÕES FUNCIONAIS
+    ============================================
+]]
+
+local FluentUI = loadstring(game:HttpGet("URL_DO_SCRIPT"))()
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local Player = Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+
+-- Criar janela
+local Window = FluentUI:CreateWindow({
+    Title = "Fluent Hub",
+    Subtitle = "v1.0 - Script Completo"
+})
+
+-- Notificação de boas-vindas
+Window:Notify({
+    Title = "Bem-vindo!",
+    Content = "Script carregado com sucesso!",
+    Duration = 4,
+    Type = "Success"
+})
+
+-- Variáveis globais
+local ESPEnabled = false
+local ESPColor = Color3.fromRGB(255, 0, 0)
+local FlyEnabled = false
+local FlySpeed = 50
+local SpeedEnabled = false
+local WalkSpeed = 16
+local JumpPowerEnabled = false
+local JumpPower = 50
+
+-- ======== ABA PRINCIPAL ========
+local MainTab = Window:CreateTab({
+    Name = "Principal",
+    Icon = "🏠"
+})
+
+MainTab:CreateSection("🎯 Movimento")
+
+-- Velocidade
+MainTab:CreateToggle({
+    Name = "Velocidade Customizada",
+    Default = false,
+    Callback = function(value)
+        SpeedEnabled = value
+        if not value then
+            Humanoid.WalkSpeed = 16
+        end
+        Window:Notify({
+            Title = "Velocidade",
+            Content = value and "Ativado!" or "Desativado!",
+            Type = value and "Success" or "Warning"
+        })
+    end
+})
+
+MainTab:CreateSlider({
+    Name = "Velocidade",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Callback = function(value)
+        WalkSpeed = value
+        if SpeedEnabled then
+            Humanoid.WalkSpeed = value
+        end
+    end
+})
+
+-- Força do Pulo
+MainTab:CreateToggle({
+    Name = "Pulo Customizado",
+    Default = false,
+    Callback = function(value)
+        JumpPowerEnabled = value
+        if not value then
+            Humanoid.JumpPower = 50
+        end
+        Window:Notify({
+            Title = "Força do Pulo",
+            Content = value and "Ativado!" or "Desativado!",
+            Type = value and "Success" or "Warning"
+        })
+    end
+})
+
+MainTab:CreateSlider({
+    Name = "Força do Pulo",
+    Min = 50,
+    Max = 300,
+    Default = 50,
+    Callback = function(value)
+        JumpPower = value
+        if JumpPowerEnabled then
+            Humanoid.JumpPower = value
+        end
+    end
+})
+
+-- Fly
+MainTab:CreateToggle({
+    Name = "Voar (Fly)",
+    Default = false,
+    Callback = function(value)
+        FlyEnabled = value
+        
+        if value then
+            -- Sistema de Fly
+            local BodyVelocity = Instance.new("BodyVelocity")
+            BodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
+            BodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            BodyVelocity.Parent = Character.HumanoidRootPart
+            
+            local BodyGyro = Instance.new("BodyGyro")
+            BodyGyro.MaxTorque = Vector3.new(100000, 100000, 100000)
+            BodyGyro.P = 10000
+            BodyGyro.Parent = Character.HumanoidRootPart
+            
+            local FlyConnection
+            FlyConnection = RunService.Heartbeat:Connect(function()
+                if not FlyEnabled then
+                    BodyVelocity:Destroy()
+                    BodyGyro:Destroy()
+                    FlyConnection:Disconnect()
+                    return
+                end
+                
+                local Camera = workspace.CurrentCamera
+                local MoveDirection = Vector3.new(0, 0, 0)
+                
+                if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                    MoveDirection = MoveDirection + Camera.CFrame.LookVector
+                end
+                if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                    MoveDirection = MoveDirection - Camera.CFrame.LookVector
+                end
+                if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                    MoveDirection = MoveDirection - Camera.CFrame.RightVector
+                end
+                if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                    MoveDirection = MoveDirection + Camera.CFrame.RightVector
+                end
+                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                    MoveDirection = MoveDirection + Vector3.new(0, 1, 0)
+                end
+                if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+                    MoveDirection = MoveDirection - Vector3.new(0, 1, 0)
+                end
+                
+                BodyVelocity.Velocity = MoveDirection * FlySpeed
+                BodyGyro.CFrame = Camera.CFrame
+            end)
+            
             Window:Notify({
-                Title = "Botão",
-                Content = "Você clicou no botão!",
-                Type = "Info"
+                Title = "Fly",
+                Content = "Use WASD + Space/Shift para voar!",
+                Type = "Info",
+                Duration = 5
             })
         end
-    })
-    
-    MainTab:CreateToggle({
-        Name = "Ativar Feature",
-        Default = false,
-        Callback = function(value)
-            print("Toggle:", value)
-        end
-    })
-    
-    MainTab:CreateSlider({
-        Name = "Velocidade",
-        Min = 0,
-        Max = 100,
-        Default = 50,
-        Callback = function(value)
-            print("Slider:", value)
-        end
-    })
-    
-    MainTab:CreateSection("Configurações")
-    
-    MainTab:CreateTextBox({
-        Name = "Nome do Jogador",
-        Placeholder = "Digite o nome...",
-        Callback = function(text)
-            print("TextBox:", text)
-        end
-    })
-    
-    MainTab:CreateDropdown({
-        Name = "Selecionar Modo",
-        Options = {"Modo 1", "Modo 2", "Modo 3"},
-        Default = "Modo 1",
-        Callback = function(option)
-            print("Dropdown:", option)
-        end
-    })
-    
-    MainTab:CreateKeybind({
-        Name = "Toggle UI",
-        Default = Enum.KeyCode.RightShift,
-        Callback = function()
-            print("Keybind pressionada!")
-        end
-    })
-    
-    MainTab:CreateColorPicker({
-        Name = "Cor do ESP",
-        Default = Color3.fromRGB(255, 0, 0),
-        Callback = function(color)
-            print("Color:", color)
-        end
-    })
-    
-    -- Segunda aba
-    local SettingsTab = Window:CreateTab({
-        Name = "Configurações",
-        Icon = "⚙️"
-    })
-    
-    SettingsTab:CreateSection("Configurações Gerais")
-    
-    SettingsTab:CreateButton({
-        Name = "Resetar Configurações",
-        Callback = function()
+    end
+})
+
+MainTab:CreateSlider({
+    Name = "Velocidade do Fly",
+    Min = 10,
+    Max = 200,
+    Default = 50,
+    Callback = function(value)
+        FlySpeed = value
+    end
+})
+
+-- ======== ABA VISUAL ========
+local VisualTab = Window:CreateTab({
+    Name = "Visual",
+    Icon = "👁️"
+})
+
+VisualTab:CreateSection("🔍 ESP")
+
+-- ESP Toggle
+VisualTab:CreateToggle({
+    Name = "ESP (Jogadores)",
+    Default = false,
+    Callback = function(value)
+        ESPEnabled = value
+        
+        if value then
+            -- Criar ESP para todos os jogadores
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player ~= Player then
+                    local function CreateESP(character)
+                        if character:FindFirstChild("HumanoidRootPart") and not character:FindFirstChild("ESP_Highlight") then
+                            local Highlight = Instance.new("Highlight")
+                            Highlight.Name = "ESP_Highlight"
+                            Highlight.FillColor = ESPColor
+                            Highlight.OutlineColor = ESPColor
+                            Highlight.FillTransparency = 0.5
+                            Highlight.OutlineTransparency = 0
+                            Highlight.Parent = character
+                        end
+                    end
+                    
+                    if player.Character then
+                        CreateESP(player.Character)
+                    end
+                    
+                    player.CharacterAdded:Connect(function(char)
+                        if ESPEnabled then
+                            CreateESP(char)
+                        end
+                    end)
+                end
+            end
+            
             Window:Notify({
-                Title = "Reset",
-                Content = "Configurações resetadas!",
-                Type = "Warning"
+                Title = "ESP",
+                Content = "ESP ativado!",
+                Type = "Success"
+            })
+        else
+            -- Remover todos os ESPs
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player.Character and player.Character:FindFirstChild("ESP_Highlight") then
+                    player.Character.ESP_Highlight:Destroy()
+                end
+            end
+        end
+    end
+})
+
+-- Cor do ESP
+VisualTab:CreateColorPicker({
+    Name = "Cor do ESP",
+    Default = Color3.fromRGB(255, 0, 0),
+    Callback = function(color)
+        ESPColor = color
+        
+        -- Atualizar cor de todos os ESPs ativos
+        if ESPEnabled then
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player.Character and player.Character:FindFirstChild("ESP_Highlight") then
+                    local highlight = player.Character.ESP_Highlight
+                    highlight.FillColor = color
+                    highlight.OutlineColor = color
+                end
+            end
+        end
+    end
+})
+
+VisualTab:CreateSection("🎨 Interface")
+
+VisualTab:CreateButton({
+    Name = "Fullbright",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+        Lighting.Brightness = 2
+        Lighting.ClockTime = 14
+        Lighting.FogEnd = 100000
+        Lighting.GlobalShadows = false
+        Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+        
+        Window:Notify({
+            Title = "Fullbright",
+            Content = "Iluminação máxima ativada!",
+            Type = "Success"
+        })
+    end
+})
+
+-- ======== ABA TELEPORTE ========
+local TeleportTab = Window:CreateTab({
+    Name = "Teleporte",
+    Icon = "🚀"
+})
+
+TeleportTab:CreateSection("📍 Teleporte Rápido")
+
+TeleportTab:CreateTextBox({
+    Name = "Nome do Jogador",
+    Placeholder = "Digite o nome do jogador...",
+    Callback = function(text)
+        local targetPlayer = nil
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Name:lower():find(text:lower()) or player.DisplayName:lower():find(text:lower()) then
+                targetPlayer = player
+                break
+            end
+        end
+        
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+            Window:Notify({
+                Title = "Teleporte",
+                Content = "Teleportado para " .. targetPlayer.Name,
+                Type = "Success"
+            })
+        else
+            Window:Notify({
+                Title = "Erro",
+                Content = "Jogador não encontrado!",
+                Type = "Error"
             })
         end
-    })
-    
-    -- Terceira aba
-    local InfoTab = Window:CreateTab({
-        Name = "Informações",
-        Icon = "ℹ️"
-    })
-    
-    InfoTab:CreateSection("Sobre")
-    InfoTab:CreateButton({
-        Name = "Discord",
-        Callback = function()
+    end
+})
+
+TeleportTab:CreateDropdown({
+    Name = "Teleporte para Jogador",
+    Options = (function()
+        local names = {}
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= Player then
+                table.insert(names, player.Name)
+            end
+        end
+        return names
+    end)(),
+    Default = "Selecione",
+    Callback = function(option)
+        local targetPlayer = Players:FindFirstChild(option)
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
             Window:Notify({
-                Title = "Discord",
-                Content = "Link copiado!",
+                Title = "Teleporte",
+                Content = "Teleportado para " .. option,
                 Type = "Success"
             })
         end
-    })
-]]
+    end
+})
+
+-- ======== ABA CONFIGURAÇÕES ========
+local SettingsTab = Window:CreateTab({
+    Name = "Configurações",
+    Icon = "⚙️"
+})
+
+SettingsTab:CreateSection("🎮 Controles")
+
+SettingsTab:CreateKeybind({
+    Name = "Toggle UI",
+    Default = Enum.KeyCode.RightShift,
+    Callback = function()
+        Main.Visible = not Main.Visible
+    end
+})
+
+SettingsTab:CreateSection("🔧 Outras Opções")
+
+SettingsTab:CreateButton({
+    Name = "Resetar Personagem",
+    Callback = function()
+        Character.Humanoid.Health = 0
+        Window:Notify({
+            Title = "Reset",
+            Content = "Personagem resetado!",
+            Type = "Warning"
+        })
+    end
+})
+
+SettingsTab:CreateButton({
+    Name = "Rejoin (Reconectar)",
+    Callback = function()
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, Player)
+    end
+})
+
+-- ======== ABA INFO ========
+local InfoTab = Window:CreateTab({
+    Name = "Informações",
+    Icon = "ℹ️"
+})
+
+InfoTab:CreateSection("📖 Sobre o Script")
+
+InfoTab:CreateButton({
+    Name = "Copiar Discord",
+    Callback = function()
+        setclipboard("discord.gg/exemplo")
+        Window:Notify({
+            Title = "Discord",
+            Content = "Link copiado para área de transferência!",
+            Type = "Success"
+        })
+    end
+})
+
+InfoTab:CreateButton({
+    Name = "Créditos",
+    Callback = function()
+        Window:Notify({
+            Title = "Créditos",
+            Content = "Feito com Fluent UI Library",
+            Type = "Info",
+            Duration = 5
+        })
+    end
+})
+
+-- Loop para manter configurações
+RunService.Heartbeat:Connect(function()
+    if SpeedEnabled and Humanoid then
+        Humanoid.WalkSpeed = WalkSpeed
+    end
+    
+    if JumpPowerEnabled and Humanoid then
+        Humanoid.JumpPower = JumpPower
+    end
+end)
