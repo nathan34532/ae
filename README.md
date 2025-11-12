@@ -1,9 +1,10 @@
--- AetherUI - A UI Library Fluida, Moderna e Animada
--- Feita para desenvolvedores de jogos Roblox
--- Totalmente segura e dentro dos ToS
+-- AetherUI v2.0 - UI Library Fluida e Moderna
+-- Cole isso no GitHub como AetherUI.lua
 
 local AetherUI = {}
 AetherUI.__index = AetherUI
+
+print("AetherUI carregando...")
 
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -12,7 +13,7 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
 
--- Configurações globais
+-- Configurações
 local Config = {
     AccentColor = Color3.fromRGB(0, 170, 255),
     Background = Color3.fromRGB(25, 25, 30),
@@ -22,7 +23,6 @@ local Config = {
     AnimationTime = 0.25
 }
 
--- Função de animação suave
 local function Tween(instance, properties, duration, easing)
     duration = duration or Config.AnimationTime
     easing = easing or Enum.EasingStyle.Quart
@@ -74,7 +74,6 @@ function AetherUI:Notify(title, text, duration)
     textLabel.TextWrapped = true
     textLabel.Parent = notif
 
-    -- Animação de entrada
     Tween(notif, {Position = UDim2.new(1, -320, 1, -100)}, 0.4, Enum.EasingStyle.Back)
 
     task.delay(duration, function()
@@ -84,7 +83,7 @@ function AetherUI:Notify(title, text, duration)
     end)
 end
 
--- Criar janela principal
+-- Window
 function AetherUI:Window(options)
     options = options or {}
     local title = options.Title or "AetherUI"
@@ -100,7 +99,6 @@ function AetherUI:Window(options)
     local titleLabel = Instance.new("TextLabel")
     local closeBtn = Instance.new("TextButton")
     local container = Instance.new("Frame")
-    local listLayout = Instance.new("UIListLayout")
 
     main.Size = size
     main.Position = UDim2.new(0.5, -size.X.Offset/2, 0.5, -size.Y.Offset/2)
@@ -141,11 +139,6 @@ function AetherUI:Window(options)
     container.BackgroundTransparency = 1
     container.Parent = main
 
-    listLayout.Padding = UDim.new(0, 8)
-    listLayout.FillDirection = Enum.FillDirection.Vertical
-    listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    listLayout.Parent = container
-
     -- Dragging
     local dragging = false
     local dragStart, startPos
@@ -167,24 +160,18 @@ function AetherUI:Window(options)
     UserInputService.InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - dragStart
-            main.Position = UDim2.new(
-                startPos.X.Scale, startPos.X.Offset + delta.X,
-                startPos.Y.Scale, startPos.Y.Offset + delta.Y
-            )
+            main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
 
     closeBtn.MouseButton1Click:Connect(function()
-        Tween(main, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)}, 0.3):Completed:Connect(function()
+        Tween(main, {Size = UDim2.new(0, 0, 0, 0)}, 0.3):Completed:Connect(function()
             screenGui:Destroy()
         end)
     end)
 
     local window = {ScreenGui = screenGui, Container = container}
-
-    -- Tab System
     local tabs = {}
-    local tabButtons = {}
 
     function window:Tab(name)
         local tabFrame = Instance.new("ScrollingFrame")
@@ -220,107 +207,36 @@ function AetherUI:Window(options)
         btnCorner.Parent = tabBtn
 
         local indicator = Instance.new("Frame")
-        indicator.Size = UDim2.new(1, 0, 0, 2)
+        indicator.Size = UDim2.new(0, 0, 0, 2)
         indicator.Position = UDim2.new(0, 0, 1, -2)
         indicator.BackgroundColor3 = Config.AccentColor
-        indicator.Parent = tabBtn
         indicator.Visible = false
+        indicator.Parent = tabBtn
 
-        local tab = {
-            Frame = tabFrame,
-            Button = tabBtn,
-            Indicator = indicator
-        }
-
+        local tab = {Frame = tabFrame, Button = tabBtn, Indicator = indicator}
         table.insert(tabs, tab)
-        table.insert(tabButtons, tabBtn)
 
-        -- Layout dos botões
-        for i, btn in ipairs(tabButtons) do
-            btn.Position = UDim2.new(0, 15 + (i-1) * 110, 0, 5)
+        for i, btn in ipairs(container:GetChildren()) do
+            if btn:IsA("TextButton") then
+                btn.Position = UDim2.new(0, 15 + (i-1) * 110, 0, 5)
+            end
         end
 
         tabBtn.MouseButton1Click:Connect(function()
             for _, t in ipairs(tabs) do
                 t.Frame.Visible = false
-                Tween(t.Indicator, {Size = UDim2.new(0, 0, 0, 2)}, 0.2)
                 t.Indicator.Visible = false
+                Tween(t.Indicator, {Size = UDim2.new(0, 0, 0, 2)}, 0.2)
             end
             tab.Frame.Visible = true
             tab.Indicator.Visible = true
             Tween(tab.Indicator, {Size = UDim2.new(1, 0, 0, 2)}, 0.3)
-            Tween(tabBtn, {BackgroundColor3 = Color3.fromRGB(45, 45, 50)}, 0.2)
-            task.delay(0.2, function()
-                Tween(tabBtn, {BackgroundColor3 = Config.Secondary}, 0.2)
-            end)
         end)
 
-        if #tabs == 1 then
-            tabBtn.MouseButton1Click:Fire()
-        end
+        if #tabs == 1 then tabBtn.MouseButton1Click:Fire() end
 
-        local elements = {}
-
-        -- Toggle
-        function tab:Toggle(text, callback, default)
-            local toggle = Instance.new("Frame")
-            local label = Instance.new("TextLabel")
-            local box = Instance.new("Frame")
-            local check = Instance.new("Frame")
-            local corner1 = Instance.new("UICorner")
-            local corner2 = Instance.new("UICorner")
-
-            toggle.Size = UDim2.new(1, 0, 0, 36)
-            toggle.BackgroundColor3 = Config.Secondary
-            toggle.Parent = tabFrame
-
-            corner1.CornerRadius = Config.CornerRadius
-            corner1.Parent = toggle
-
-            label.Size = UDim2.new(1, -60, 1, 0)
-            label.Position = UDim2.new(0, 12, 0, 0)
-            label.BackgroundTransparency = 1
-            label.Text = text
-            label.TextColor3 = Config.Text
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 14
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Parent = toggle
-
-            box.Size = UDim2.new(0, 40, 0, 20)
-            box.Position = UDim2.new(1, -52, 0.5, -10)
-            box.BackgroundColor3 = default and Config.AccentColor or Color3.fromRGB(60, 60, 70)
-            box.Parent = toggle
-
-            corner2.CornerRadius = UDim.new(0, 10)
-            corner2.Parent = box
-
-            check.Size = UDim2.new(0, 16, 0, 16)
-            check.Position = default and UDim2.new(0, 20, 0.5, -8) or UDim2.new(0, 4, 0.5, -8)
-            check.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            check.Parent = box
-
-            local checkCorner = Instance.new("UICorner")
-            checkCorner.CornerRadius = UDim.new(0, 8)
-            checkCorner.Parent = check
-
-            local enabled = default or false
-            toggle.MouseButton1Click:Connect(function()
-                enabled = not enabled
-                Tween(box, {BackgroundColor3 = enabled and Config.AccentColor or Color3.fromRGB(60, 60, 70)}, 0.2)
-                Tween(check, {Position = enabled and UDim2.new(0, 20, 0.5, -8) or UDim2.new(0, 4, 0.5, -8)}, 0.2)
-                if callback then callback(enabled) end
-            end)
-
-            elements[#elements+1] = toggle
-            return toggle
-        end
-
-        -- Button
         function tab:Button(text, callback)
             local btn = Instance.new("TextButton")
-            local corner = Instance.new("UICorner")
-
             btn.Size = UDim2.new(1, 0, 0, 36)
             btn.BackgroundColor3 = Config.AccentColor
             btn.Text = text
@@ -330,6 +246,7 @@ function AetherUI:Window(options)
             btn.AutoButtonColor = false
             btn.Parent = tabFrame
 
+            local corner = Instance.new("UICorner")
             corner.CornerRadius = Config.CornerRadius
             corner.Parent = btn
 
@@ -343,7 +260,6 @@ function AetherUI:Window(options)
             btn.MouseEnter:Connect(function()
                 Tween(btn, {BackgroundColor3 = Color3.fromRGB(0, 150, 230)}, 0.2)
             end)
-
             btn.MouseLeave:Connect(function()
                 Tween(btn, {BackgroundColor3 = Config.AccentColor}, 0.2)
             end)
@@ -351,255 +267,11 @@ function AetherUI:Window(options)
             return btn
         end
 
-        -- Slider
-        function tab:Slider(text, min, max, callback, default)
-            local slider = Instance.new("Frame")
-            local label = Instance.new("TextLabel")
-            local valueLabel = Instance.new("TextLabel")
-            local bar = Instance.new("Frame")
-            local fill = Instance.new("Frame")
-            local knob = Instance.new("Frame")
-
-            slider.Size = UDim2.new(1, 0, 0, 50)
-            slider.BackgroundColor3 = Config.Secondary
-            slider.Parent = tabFrame
-
-            local corner = Instance.new("UICorner")
-            corner.CornerRadius = Config.CornerRadius
-            corner.Parent = slider
-
-            label.Size = UDim2.new(0.6, 0, 0, 20)
-            label.Position = UDim2.new(0, 12, 0, 8)
-            label.BackgroundTransparency = 1
-            label.Text = text
-            label.TextColor3 = Config.Text
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 14
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Parent = slider
-
-            valueLabel.Size = UDim2.new(0.3, 0, 0, 20)
-            valueLabel.Position = UDim2.new(0.7, -12, 0, 8)
-            valueLabel.BackgroundTransparency = 1
-            valueLabel.Text = tostring(default or min)
-            valueLabel.TextColor3 = Config.AccentColor
-            valueLabel.Font = Enum.Font.GothamBold
-            valueLabel.TextSize = 14
-            valueLabel.TextXAlignment = Enum.TextXAlignment.Right
-            valueLabel.Parent = slider
-
-            bar.Size = UDim2.new(1, -24, 0, 6)
-            bar.Position = UDim2.new(0, 12, 0, 32)
-            bar.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
-            bar.Parent = slider
-
-            local barCorner = Instance.new("UICorner")
-            barCorner.CornerRadius = UDim.new(0, 3)
-            barCorner.Parent = bar
-
-            fill.Size = UDim2.new((default or min - min) / (max - min), 0, 1, 0)
-            fill.BackgroundColor3 = Config.AccentColor
-            fill.Parent = bar
-
-            local fillCorner = Instance.new("UICorner")
-            fillCorner.CornerRadius = UDim.new(0, 3)
-            fillCorner.Parent = fill
-
-            knob.Size = UDim2.new(0, 16, 0, 16)
-            knob.Position = UDim2.new(fill.Size.X.Scale - 0.5, -8, 0.5, -8)
-            knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            knob.Parent = bar
-
-            local knobCorner = Instance.new("UICorner")
-            knobCorner.CornerRadius = UDim.new(1, 0)
-            knobCorner.Parent = knob
-
-            local dragging = false
-            bar.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = true
-                end
-            end)
-
-            bar.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = false
-                end
-            end)
-
-            RunService.RenderStepped:Connect(function()
-                if dragging then
-                    local mouseX = mouse.X - bar.AbsolutePosition.X
-                    local percent = math.clamp(mouseX / bar.AbsoluteSize.X, 0, 1)
-                    local value = math.floor(min + (max - min) * percent)
-                    fill.Size = UDim2.new(percent, 0, 1, 0)
-                    knob.Position = UDim2.new(percent, -8, 0.5, -8)
-                    valueLabel.Text = tostring(value)
-                    if callback then callback(value) end
-                end
-            end)
-
-            return slider
-        end
-
-        -- Color Picker
-        function tab:ColorPicker(text, callback, default)
-            local picker = Instance.new("Frame")
-            local label = Instance.new("TextLabel")
-            local colorBtn = Instance.new("TextButton")
-            local hue = Instance.new("ImageLabel")
-            local saturation = Instance.new("ImageLabel")
-            local pickerKnob = Instance.new("Frame")
-
-            picker.Size = UDim2.new(1, 0, 0, 140)
-            picker.BackgroundColor3 = Config.Secondary
-            picker.Parent = tabFrame
-
-            local corner = Instance.new("UICorner")
-            corner.CornerRadius = Config.CornerRadius
-            corner.Parent = picker
-
-            label.Size = UDim2.new(1, -100, 0, 30)
-            label.Position = UDim2.new(0, 12, 0, 8)
-            label.BackgroundTransparency = 1
-            label.Text = text
-            label.TextColor3 = Config.Text
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 14
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Parent = picker
-
-            colorBtn.Size = UDim2.new(0, 60, 0, 24)
-            colorBtn.Position = UDim2.new(1, -72, 0, 8)
-            colorBtn.BackgroundColor3 = default or Config.AccentColor
-            colorBtn.Text = ""
-            colorBtn.Parent = picker
-
-            local btnCorner = Instance.new("UICorner")
-            btnCorner.CornerRadius = UDim.new(0, 6)
-            btnCorner.Parent = colorBtn
-
-            -- Criar UI de picker (simplificado)
-            -- Em produção, use imagens ou ImageLabels com gradientes
-            -- Aqui usamos cores sólidas para exemplo
-
-            local open = false
-            colorBtn.MouseButton1Click:Connect(function()
-                open = not open
-                -- Implementar picker completo aqui
-                AetherUI:Notify("Color Picker", "Em desenvolvimento!", 2)
-            end)
-
-            return picker
-        end
-
-        -- Textbox
-        function tab:Textbox(text, placeholder, callback)
-            local box = Instance.new("Frame")
-            local label = Instance.new("TextLabel")
-            local input = Instance.new("TextBox")
-
-            box.Size = UDim2.new(1, 0, 0, 36)
-            box.BackgroundColor3 = Config.Secondary
-            box.Parent = tabFrame
-
-            local corner = Instance.new("UICorner")
-            corner.CornerRadius = Config.CornerRadius
-            corner.Parent = box
-
-            label.Size = UDim2.new(0.4, 0, 1, 0)
-            label.Position = UDim2.new(0, 12, 0, 0)
-            label.BackgroundTransparency = 1
-            label.Text = text
-            label.TextColor3 = Config.Text
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 14
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Parent = box
-
-            input.Size = UDim2.new(0.55, 0, 0, 24)
-            input.Position = UDim2.new(0.45, 0, 0.5, -12)
-            input.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-            input.Text = ""
-            input.PlaceholderText = placeholder
-            input.TextColor3 = Config.Text
-            input.Font = Enum.Font.Gotham
-            input.TextSize = 14
-            input.Parent = box
-
-            local inputCorner = Instance.new("UICorner")
-            inputCorner.CornerRadius = UDim.new(0, 6)
-            inputCorner.Parent = input
-
-            input.FocusLost:Connect(function(enter)
-                if enter and callback then
-                    callback(input.Text)
-                end
-            end)
-
-            return box
-        end
-
-        -- Keybind
-        function tab:Keybind(text, callback, default)
-            local bind = Instance.new("Frame")
-            local label = Instance.new("TextLabel")
-            local keyBtn = Instance.new("TextButton")
-
-            bind.Size = UDim2.new(1, 0, 0, 36)
-            bind.BackgroundColor3 = Config.Secondary
-            bind.Parent = tabFrame
-
-            local corner = Instance.new("UICorner")
-            corner.CornerRadius = Config.CornerRadius
-            corner.Parent = bind
-
-            label.Size = UDim2.new(0.6, 0, 1, 0)
-            label.Position = UDim2.new(0, 12, 0, 0)
-            label.BackgroundTransparency = 1
-            label.Text = text
-            label.TextColor3 = Config.Text
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 14
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Parent = bind
-
-            keyBtn.Size = UDim2.new(0, 80, 0, 24)
-            keyBtn.Position = UDim2.new(1, -92, 0.5, -12)
-            keyBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-            keyBtn.Text = default and default.Name or "None"
-            keyBtn.TextColor3 = Config.Text
-            keyBtn.Font = Enum.Font.Gotham
-            keyBtn.TextSize = 14
-            keyBtn.Parent = bind
-
-            local btnCorner = Instance.new("UICorner")
-            btnCorner.CornerRadius = UDim.new(0, 6)
-            btnCorner.Parent = keyBtn
-
-            local listening = false
-            keyBtn.MouseButton1Click:Connect(function()
-                listening = true
-                keyBtn.Text = "..."
-                AetherUI:Notify("Keybind", "Pressione uma tecla...", 3)
-            end)
-
-            UserInputService.InputBegan:Connect(function(input)
-                if listening and input.KeyCode ~= Enum.KeyCode.Unknown then
-                    listening = false
-                    keyBtn.Text = input.KeyCode.Name
-                    if callback then callback(input.KeyCode) end
-                end
-            end)
-
-            return bind
-        end
-
-        tab.Elements = elements
         return tab
     end
 
     return window
 end
 
+print("AetherUI carregada com sucesso!")
 return AetherUI
